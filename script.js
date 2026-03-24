@@ -2,11 +2,12 @@
 const typewriterEffect = (element, newText, isHTML = false, duration = 800) => {
     if (!element) return;
     
+    // Check if element has multiple children / structure rather than pure text.
+    // The current setup assumes text only or simple HTML tags handled by innerHTML
     const targetText = isHTML ? newText : newText.replace(/<[^>]*>/g, '');
     const startTime = performance.now();
     const originalHTML = element.innerHTML;
     
-    // Create a cursor element
     const cursor = document.createElement('span');
     cursor.className = 'inline-block w-[2px] h-[1.1em] bg-[#FF4F00] ml-1 align-middle animate-pulse';
     cursor.id = 'typewriter-cursor';
@@ -79,7 +80,31 @@ const translations = {
         ind_cat6: 'Diseño Minimalista',
         list1: ['Desarrollo de Forma', 'Lenguajes de Diseño', 'Ergonomía'],
         list2: ['Innovación en Materiales', 'Enlace de Producción', 'Prototipado'],
-        list3: ['IU Embebida', 'Retroalimentación Háptica', 'Ecosistemas']
+        list3: ['IU Embebida', 'Retroalimentación Háptica', 'Ecosistemas'],
+        
+        // About Page Additions
+        aboutTitle: 'Diseñador. Pensador.<br/>\n                    <span class="text-[#FF4F00] italic">Creador de soluciones.</span>',
+        aboutDesc: 'Soy un diseñador industrial convencido de que la mejor tecnología es aquella que se siente humana. Combino ingeniería óptica, exploración háptica y diseño de sistemas complejos para crear experiencias tangibles, duraderas y hermosas. Con sede en Berlín y con una obsesión por el detalle absoluto.',
+        
+        // Project Lumix Additions
+        caseStudy: 'Caso de Estudio',
+        lumixHeroDesc: 'Redefiniendo el sistema visual profesional. Un riguroso viaje desde el diseño conceptual, optimización acústica, hasta la ingeniería de precisión.',
+        client: 'Cliente',
+        role: 'Rol',
+        discipline: 'Disciplina',
+        year: 'Año',
+        roleDesc: 'Diseño Industrial Jefe',
+        discDesc: 'CMF & Ingeniería Óptica',
+        challengeTag: '1. El Desafío',
+        challengeTitle: 'Equilibrar el peso, disipar el calor y mantener el lujo.',
+        challengeP1: 'Las cámaras de formato medio actuales sufren de asimetría térmica y problemas severos de peso. Nuestro objetivo en "Lumix Pro X" era tomar el cuerpo hiper-confiable que todos los fotógrafos de cine aprecian y evolucionarlo para resistir sesiones continuas en rigurosos desiertos de 50°C.',
+        challengeP2: 'No queríamos construir solo un marco de magnesio; queríamos una aleación termo-reactiva en la que la cámara respire sin partes móviles (que introducen ruidos y vulnerabilidades).',
+        ideationTag: '2. Ideación',
+        ideationTitle: 'Sketches y Primeros Prototipos',
+        cmfTag: '3. Producción y CMF',
+        cmfTitle: 'Aleaciones con alma. Texturas en negro mate.',
+        cmfDesc: 'Definimos una paleta CMF de alto contraste que prioriza el agarre. La montura central está maquinada en titanio grado aéreo, y el cuerpo está cubierto de nuestro polímero de uretano exclusivo de poros abiertos. Esto previene un agarre resbaladizo, maximiza el amortiguamiento acústico para las partes internas y se siente increíble al tacto.',
+        nextProject: 'Siguiente Proyecto'
     },
     en: {
         projects: 'Projects',
@@ -116,11 +141,73 @@ const translations = {
         ind_cat6: 'Minimalist Design',
         list1: ['Form Development', 'Design Languages', 'Ergonomics'],
         list2: ['Material Innovation', 'Production Liaison', 'Prototyping'],
-        list3: ['Embedded UI', 'Haptic Feedback', 'Ecosystems']
+        list3: ['Embedded UI', 'Haptic Feedback', 'Ecosystems'],
+        
+        // About Page Additions
+        aboutTitle: 'Designer. Thinker.<br/>\n                    <span class="text-[#FF4F00] italic">Problem solver.</span>',
+        aboutDesc: 'I am an industrial designer convinced that the best technology is that which feels human. I combine optical engineering, haptic exploration, and complex system design to create tangible, enduring, and beautiful experiences. Based in Berlin, with an absolute obsession for detail.',
+        
+        // Project Lumix Additions
+        caseStudy: 'Case Study',
+        lumixHeroDesc: 'Redefining the professional visual system. A rigorous journey from conceptual design, acoustic optimization, to precision engineering.',
+        client: 'Client',
+        role: 'Role',
+        discipline: 'Discipline',
+        year: 'Year',
+        roleDesc: 'Lead Industrial Design',
+        discDesc: 'CMF & Optical Engineering',
+        challengeTag: '1. The Challenge',
+        challengeTitle: 'Balancing weight, dissipating heat, and maintaining luxury.',
+        challengeP1: 'Current medium-format cameras suffer from thermal asymmetry and severe weight issues. Our goal with the "Lumix Pro X" was to take the hyper-reliable body that all cinema photographers cherish and evolve it to withstand continuous shoots in rigorous 50°C deserts.',
+        challengeP2: 'We didn’t just want to build a magnesium frame; we wanted a thermo-reactive alloy where the camera breathes without moving parts (which introduce noise and vulnerabilities).',
+        ideationTag: '2. Ideation',
+        ideationTitle: 'Sketches and Early Prototypes',
+        cmfTag: '3. Production and CMF',
+        cmfTitle: 'Alloys with soul. Matte black textures.',
+        cmfDesc: 'We defined a high-contrast CMF palette that prioritizes grip. The central mount is machined from aerospace-grade titanium, and the body is covered in our exclusive open-pore urethane polymer. This prevents slippery grips, maximizes acoustic dampening for internal parts, and feels incredible to the touch.',
+        nextProject: 'Next Project'
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Add entering animation
+    document.body.classList.add('page-enter');
+    document.body.addEventListener('animationend', (e) => {
+        if (e.animationName === 'pageSlideIn') {
+            document.body.classList.remove('page-enter');
+            document.body.style.transform = 'none';
+        }
+    });
+
+    // Gallery Card Interaction
+    const galleryCards = document.querySelectorAll('.gallery-card');
+    galleryCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            galleryCards.forEach(c => {
+                c.classList.remove('active');
+                c.style.flex = "1";
+            });
+            card.classList.add('active');
+            card.style.flex = "5";
+        });
+    });
+
+    // Intercept local links for exit animation
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', e => {
+            const href = link.getAttribute('href');
+            // Check if it's an internal link but not a hash link to the same page
+            if (href && !href.startsWith('#') && !href.startsWith('mailto:')) {
+                e.preventDefault();
+                document.body.classList.remove('page-enter');
+                document.body.classList.add('page-exit');
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 350);
+            }
+        });
+    });
+
     const langBtn = document.getElementById('language-toggle');
     let currentLang = 'es';
 
@@ -136,7 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if (t[key] && !el.classList.contains('nav-link') && !el.classList.contains('list-item')) {
-                const isHTML = key === 'ctaTitle';
+                // Determine if this element requires HTML injection
+                const htmlKeys = ['ctaTitle', 'aboutTitle'];
+                const isHTML = htmlKeys.includes(key);
                 typewriterEffect(el, t[key], isHTML);
             }
         });
@@ -171,7 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let current = '';
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
             if (window.scrollY >= (sectionTop - 200)) {
                 current = section.getAttribute('id');
             }
@@ -191,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const heroSection = document.getElementById('hero');
     const cursorGlow = document.getElementById('cursor-glow');
-    if (heroSection) {
+    if (heroSection && cursorGlow) {
         heroSection.addEventListener('mousemove', (e) => {
             const rect = heroSection.getBoundingClientRect();
             const x = e.clientX - rect.left;
